@@ -1,0 +1,15 @@
+---
+- name: Install required packages
+  become: yes
+  apt:
+    name: 
+      - python3-pip
+      - docker-compose-plugin
+      - ffmpeg
+    state: present
+- name: Install docker modules for Python
+  pip:
+    name:
+      - docker
+    # Allow pip to modify an externally-managed Python installation as defined by PEP 668.
+    break_system_packages: yes

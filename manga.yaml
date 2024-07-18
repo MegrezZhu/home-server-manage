@@ -1,0 +1,6 @@
+---
+- name: Start manga services
+  hosts: all
+  roles:
+    - common
+    - lanraragi

@@ -1,0 +1,26 @@
+---
+services:
+  navidrome:
+    # image: deluan/navidrome:latest
+    image: deluan/navidrome:develop
+    container_name: navidrome
+    user: 1000:1000 # should be owner of volumes
+    environment:
+      # Optional: put your config options customization here. Examples:
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: debug  
+      ND_SESSIONTIMEOUT: 24h
+      ND_BASEURL: ""
+      ND_RECENTLYADDEDBYMODTIME: true
+      ND_PORT: "4533"
+      ND_ENABLETRANSCODINGCONFIG: true
+      ND_PASSWORDENCRYPTIONKEY: "{{password_encryption_key}}"
+    volumes:
+      - "{{database}}:/data"
+      - "{{content}}:/music:ro"
+    restart: unless-stopped
+    networks:
+      - traefik-proxy-network
+networks:
+  traefik-proxy-network:
+    external: true

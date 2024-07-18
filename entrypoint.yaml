@@ -1,0 +1,6 @@
+---
+- name: Start Traefik services
+  hosts: all
+  roles:
+    - common
+    - traefik

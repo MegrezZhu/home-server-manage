@@ -1,0 +1,24 @@
+# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    # Important: Special steps needed for Ubuntu to free port 53: https://github.com/pi-hole/docker-pi-hole?tab=readme-ov-file#installing-on-ubuntu-or-fedora
+    network_mode: "host"
+    environment:
+      TZ: "America/Chicago"
+      WEBPASSWORD: "{{ vault_pihole.WEBPASSWORD }}"
+      PIHOLE_DNS_: "8.8.8.8;8.8.4.4"
+      FTLCONF_LOCAL_IPV4: "{{ vault_pihole.FTLCONF_LOCAL_IPV4 }}"
+      # Shouldn't be access directly, but through traefik reverse proxy
+      WEB_PORT: "{{ vault_pihole.WEB_PORT }}"
+      # Ideally we should bind to only the IP that traefik uses to access it.
+      # But I don't know how to get it.
+      # To get that IP after creation: attach into the container and run `ip addr show dev eth0`
+      # Anyway this web interface is proctected by password.
+      WEB_BIND_ADDR: 0.0.0.0
+    # Volumes store your data between container upgrades
+    volumes:
+      - "./etc-pihole:/etc/pihole"
+      - "./etc-dnsmasq.d:/etc/dnsmasq.d"
+    restart: unless-stopped

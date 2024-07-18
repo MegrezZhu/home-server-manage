@@ -1,0 +1,24 @@
+---
+services:
+  traefik:
+    # The official v3 Traefik docker image
+    image: traefik:v3.1
+    container_name: traefik
+    ports:
+      - "{{subnet}}80:80"
+      - "{{subnet}}443:443"
+      # The Web UI (enabled by --api.insecure=true)
+      - "{{subnet}}8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "{{config_path}}:/etc/traefik/traefik.yaml"
+      - "{{provider_path}}:/etc/traefik/dynamic_conf.yaml"
+    networks:
+      - traefik-proxy-network
+    extra_hosts:
+      # For connecting to host network using dns name "host.docker.internal"
+      - "host.docker.internal:host-gateway"
+networks:
+  traefik-proxy-network:
+    name: traefik-proxy-network

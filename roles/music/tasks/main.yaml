@@ -1,0 +1,35 @@
+---
+- name: Define service root
+  set_fact:
+    navidrome: "{{ ansible_env.HOME }}/navidrome"
+- name: Set up service root
+  file:
+    path: "{{ navidrome }}"
+    state: directory
+- name: Set up database dir
+  file:
+    path: "{{ navidrome }}/data"
+    state: directory
+- name: Mount NAS drive
+  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html
+  ansible.posix.mount:
+    src: {{ vault_music.nas_src }}
+    path: "{{ navidrome }}/mounted_drive"
+    boot: true
+    opts: "username={{ vault_music.nas_username }},password={{ vault_music.nas_password }},file_mode=0777,dir_mode=0777"
+    fstype: cifs
+    state: mounted
+  become: true
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ navidrome }}/compose.yaml"
+  vars:
+    database: "{{ navidrome }}/data"
+    content: "{{ navidrome }}/mounted_drive"
+    # Should not change unless very carefully as it's been used to encrypt the password in its db
+    password_encryption_key: "{{ vault_music.password_encryption_key }}"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ navidrome }}"
+    recreate: always

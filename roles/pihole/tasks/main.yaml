@@ -1,0 +1,16 @@
+---
+- name: Define service root
+  set_fact:
+    pihole: "{{ ansible_env.HOME }}/pihole"
+- name: Set up service root
+  file:
+    path: "{{ pihole }}"
+    state: directory
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ pihole }}/compose.yaml"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ pihole }}"
+    recreate: always

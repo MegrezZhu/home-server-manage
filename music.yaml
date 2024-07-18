@@ -1,0 +1,6 @@
+---
+- name: music
+  hosts: all
+  roles:
+    - common
+    - music

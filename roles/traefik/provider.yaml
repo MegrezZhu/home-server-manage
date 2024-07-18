@@ -1,0 +1,42 @@
+# http routing section
+http:
+  routers:
+    to-traefik:
+      rule: "Host(`traefik.zyucoo.org`)"
+      service: api@internal
+      middlewares:
+        - traefik-ip-whitelist
+        - traefik-basic-auth
+    to-lanraragi:
+      rule: "Host(`lanraragi.zyucoo.org`)"
+      service: lanraragi
+    to-navidrome:
+      rule: "Host(`navidrome.zyucoo.org`)"
+      service: navidrome
+    to-pihole:
+      rule: "Host(`pi.hole`)"
+      service: pihole
+
+  middlewares:
+    traefik-basic-auth:
+      basicAuth:
+        users:
+          - "{{ vault_traefik.basic_auth_user }}"
+    traefik-ip-whitelist:
+      ipWhiteList:
+        sourceRange:
+          - "10.0.0.0/24"
+
+  services:
+    lanraragi:
+      loadBalancer:
+        servers:
+        - url: http://lanraragi:3000/
+    navidrome:
+      loadBalancer:
+        servers:
+        - url: http://navidrome:4533/
+    pihole:
+      loadBalancer:
+        servers:
+        - url: "http://host.docker.internal:{{ vault_pihole.WEB_PORT }}/"

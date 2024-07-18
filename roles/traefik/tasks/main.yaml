@@ -1,0 +1,28 @@
+---
+- name: Define service root
+  set_fact:
+    traefik: "{{ ansible_env.HOME }}/traefik"
+- name: Set up service root
+  file:
+    path: "{{ traefik }}"
+    state: directory
+- name: Copy over traefik config file
+  template:
+    src: ../configs.yaml
+    dest: "{{ traefik }}/configs.yaml"
+- name: Copy over traefik provider file
+  template:
+    src: ../provider.yaml
+    dest: "{{ traefik }}/provider.yaml"
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ traefik }}/compose.yaml"
+  vars:
+    subnet: "10.0.0.200:"
+    config_path: "{{ traefik }}/configs.yaml"
+    provider_path: "{{ traefik }}/provider.yaml"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ traefik }}"
+    recreate: always

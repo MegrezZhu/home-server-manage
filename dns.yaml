@@ -1,0 +1,6 @@
+---
+- name: Start PiHole DNS service
+  hosts: all
+  roles:
+    - common
+    - pihole

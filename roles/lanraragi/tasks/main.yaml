@@ -1,0 +1,34 @@
+---
+- name: Define service root
+  set_fact:
+    lanraragi: "{{ ansible_env.HOME }}/lanraragi"
+- name: Set up service root
+  file:
+    path: "{{ lanraragi }}"
+    state: directory
+- name: Set up database dir
+  file:
+    path: "{{ lanraragi }}/database"
+    state: directory
+- name: Mount NAS drive
+  # https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html
+  ansible.posix.mount:
+    # TODO: make NAS IP configurable
+    src: "{{ vault_lanraragi.nas_src }}"
+    path: "{{ lanraragi }}/mounted_drive"
+    boot: true
+    opts: "rw,username={{ vault_lanraragi.nas_username }},password={{ vault_lanraragi.nas_password }},file_mode=0777,dir_mode=0777"
+    state: mounted
+    fstype: cifs
+  become: true
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ lanraragi }}/compose.yaml"
+  vars:
+    database: "{{ lanraragi }}/database"
+    content: "{{ lanraragi }}/mounted_drive"
+    subnet: "10.0.0.200:"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ lanraragi }}"

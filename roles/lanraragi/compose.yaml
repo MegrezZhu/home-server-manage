@@ -1,0 +1,14 @@
+---
+services:
+  lanraragi:
+    image: difegue/lanraragi:nightly
+    container_name: lanraragi
+    volumes:
+      - "{{content}}:/home/koyomi/lanraragi/content"
+      - "{{database}}:/home/koyomi/lanraragi/database"
+    restart: unless-stopped
+    networks:
+      - traefik-proxy-network
+networks:
+  traefik-proxy-network:
+    external: true
