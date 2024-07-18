@@ -1,7 +1,6 @@
 ---
 services:
   navidrome:
-    # image: deluan/navidrome:latest
     image: deluan/navidrome:develop
     container_name: navidrome
     user: 1000:1000 # should be owner of volumes
@@ -19,6 +18,17 @@ services:
       - "{{database}}:/data"
       - "{{content}}:/music:ro"
     restart: unless-stopped
+    networks:
+      - traefik-proxy-network
+  lrcapi:
+    # For use by StreamMusic: https://github.com/HisAtri/LrcApi
+    image: hisatri/lrcapi:latest
+    container_name: lrcapi
+    volumes:
+      - "{{content}}:/music:ro"
+    environment:
+      API_AUTH: "{{ vault_music.lrcapi_auth_key }}"
+    # Default port: 28883
     networks:
       - traefik-proxy-network
 networks:

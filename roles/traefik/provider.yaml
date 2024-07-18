@@ -13,6 +13,15 @@ http:
     to-navidrome:
       rule: "Host(`navidrome.zyucoo.org`)"
       service: navidrome
+    to-lrcapi:
+      # Apis of lrcapi:
+      # - Lyric: http://navidrome.zyucoo.org/__/lrcapi/api/v1/lyrics/single
+      # - Cover (new): http://navidrome.zyucoo.org/__/lrcapi/api/v1/cover/music
+      # - Cover (old, seems compatible with MusicStream): http://navidrome.zyucoo.org/__/lrcapi/cover
+      rule: "Host(`navidrome.zyucoo.org`) && PathPrefix(`/__/lrcapi`)"
+      service: lrcapi
+      middlewares:
+        - lrcapi-strip-prefix
     to-pihole:
       rule: "Host(`pi.hole`)"
       service: pihole
@@ -26,6 +35,11 @@ http:
       ipWhiteList:
         sourceRange:
           - "10.0.0.0/24"
+    lrcapi-strip-prefix:
+      stripPrefix:
+        prefixes:
+          - "/__/lrcapi"
+        forceSlash: true
 
   services:
     lanraragi:
@@ -36,6 +50,10 @@ http:
       loadBalancer:
         servers:
         - url: http://navidrome:4533/
+    lrcapi:
+      loadBalancer:
+        servers:
+        - url: http://lrcapi:28883/
     pihole:
       loadBalancer:
         servers:
