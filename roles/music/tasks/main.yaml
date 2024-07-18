@@ -13,7 +13,7 @@
 - name: Mount NAS drive
   # https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html
   ansible.posix.mount:
-    src: {{ vault_music.nas_src }}
+    src: "{{ vault_music.nas_src }}"
     path: "{{ navidrome }}/mounted_drive"
     boot: true
     opts: "username={{ vault_music.nas_username }},password={{ vault_music.nas_password }},file_mode=0777,dir_mode=0777"
