@@ -28,7 +28,6 @@
   vars:
     database: "{{ lanraragi }}/database"
     content: "{{ lanraragi }}/mounted_drive"
-    subnet: "10.0.0.200:"
 - name: Bring up service
   community.docker.docker_compose_v2:
     project_src: "{{ lanraragi }}"

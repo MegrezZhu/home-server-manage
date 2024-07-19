@@ -5,10 +5,10 @@ services:
     image: traefik:v3.1
     container_name: traefik
     ports:
-      - "{{subnet}}80:80"
-      - "{{subnet}}443:443"
+      - "80:80"
+      - "443:443"
       # The Web UI (enabled by --api.insecure=true)
-      - "{{subnet}}8080:8080"
+      - "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock

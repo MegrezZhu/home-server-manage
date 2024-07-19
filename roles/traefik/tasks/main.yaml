@@ -24,7 +24,6 @@
     src: ../compose.yaml
     dest: "{{ traefik }}/compose.yaml"
   vars:
-    subnet: "10.0.0.200:"
     config_path: "{{ traefik }}/configs.yaml"
     provider_path: "{{ traefik }}/provider.yaml"
     acme_path: "{{ traefik }}/acme"
