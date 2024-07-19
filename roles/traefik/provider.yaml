@@ -1,19 +1,59 @@
 # http routing section
 http:
   routers:
-    to-traefik:
+    traefik:
+      entrypoints:
+        - websecure
       rule: "Host(`traefik.zyucoo.org`)"
       service: api@internal
       middlewares:
-        - traefik-ip-whitelist
+        - ip-whitelist-lan-only
         - basic-auth
-    to-lanraragi:
+      tls:
+        certResolver: my-resolver
+    traefik-http:
+      entrypoints:
+        - web
+      rule: "Host(`traefik.zyucoo.org`)"
+      service: api@internal
+      middlewares:
+        - redirect-to-https
+
+    lanraragi:
+      entrypoints:
+        - websecure
       rule: "Host(`lanraragi.zyucoo.org`)"
       service: lanraragi
-    to-navidrome:
+      middlewares:
+        - ip-whitelist-lan-only
+      tls:
+        certResolver: my-resolver
+    lanraragi-http:
+      entrypoints:
+        - web
+      rule: "Host(`lanraragi.zyucoo.org`)"
+      service: lanraragi
+      middlewares:
+        - redirect-to-https
+
+    navidrome:
+      entrypoints:
+        - websecure
       rule: "Host(`navidrome.zyucoo.org`)"
       service: navidrome
-    to-lrcapi:
+      tls:
+        certResolver: my-resolver
+    navidrome-http:
+      entrypoints:
+        - web
+      rule: "Host(`navidrome.zyucoo.org`)"
+      service: navidrome
+      middlewares:
+        - redirect-to-https
+
+    lrcapi:
+      entrypoints:
+        - websecure
       # Apis of lrcapi:
       # - Lyric: http://navidrome.zyucoo.org/__/lrcapi/api/v1/lyrics/single
       # - Cover (new): http://navidrome.zyucoo.org/__/lrcapi/api/v1/cover/music
@@ -24,7 +64,17 @@ http:
         # This service does not have good builtin auth, so we add this layer.
         - basic-auth
         - lrcapi-strip-prefix
-    to-pihole:
+      tls:
+        certResolver: my-resolver
+    lrcapi-http:
+      entrypoints:
+        - web
+      rule: "Host(`navidrome.zyucoo.org`) && PathPrefix(`/__/lrcapi`)"
+      service: lrcapi
+      middlewares:
+        - redirect-to-https
+
+    pihole:
       rule: "Host(`pi.hole`)"
       service: pihole
 
@@ -34,7 +84,7 @@ http:
         users:
           - "{{ vault_traefik.basic_auth_user }}"
         removeHeader: true
-    traefik-ip-whitelist:
+    ip-whitelist-lan-only:
       ipWhiteList:
         sourceRange:
           - "10.0.0.0/24"
@@ -43,6 +93,10 @@ http:
         prefixes:
           - "/__/lrcapi"
         forceSlash: true
+    redirect-to-https:
+      redirectScheme:
+        scheme: "https"
+        permanent: true
 
   services:
     lanraragi:

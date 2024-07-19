@@ -6,6 +6,11 @@
   file:
     path: "{{ traefik }}"
     state: directory
+- name: Set up service acme directory
+  file:
+    path: "{{ traefik }}/acme"
+    state: directory
+    mode: '0600'
 - name: Copy over traefik config file
   template:
     src: ../configs.yaml
@@ -22,6 +27,7 @@
     subnet: "10.0.0.200:"
     config_path: "{{ traefik }}/configs.yaml"
     provider_path: "{{ traefik }}/provider.yaml"
+    acme_path: "{{ traefik }}/acme"
 - name: Bring up service
   community.docker.docker_compose_v2:
     project_src: "{{ traefik }}"

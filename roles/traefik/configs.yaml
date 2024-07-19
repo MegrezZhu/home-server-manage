@@ -28,6 +28,14 @@ entryPoints:
   websecure:
     address: :443
 
+certificatesResolvers:
+  my-resolver:
+    acme:
+      email: "{{ vault_my_email }}"
+      storage: /etc/traefik/acme/acme.json
+      httpChallenge:
+        entryPoint: web
+
 ################################################################
 # Traefik logs configuration
 ################################################################
