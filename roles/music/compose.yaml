@@ -7,7 +7,6 @@ services:
     environment:
       # Optional: put your config options customization here. Examples:
       ND_SCANSCHEDULE: 1h
-      ND_LOGLEVEL: debug  
       ND_SESSIONTIMEOUT: 24h
       ND_BASEURL: ""
       ND_RECENTLYADDEDBYMODTIME: true
@@ -26,8 +25,6 @@ services:
     container_name: lrcapi
     volumes:
       - "{{content}}:/music:ro"
-    environment:
-      API_AUTH: "{{ vault_music.lrcapi_auth_key }}"
     # Default port: 28883
     networks:
       - traefik-proxy-network

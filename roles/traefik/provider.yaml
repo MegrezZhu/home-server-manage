@@ -6,7 +6,7 @@ http:
       service: api@internal
       middlewares:
         - traefik-ip-whitelist
-        - traefik-basic-auth
+        - basic-auth
     to-lanraragi:
       rule: "Host(`lanraragi.zyucoo.org`)"
       service: lanraragi
@@ -21,16 +21,19 @@ http:
       rule: "Host(`navidrome.zyucoo.org`) && PathPrefix(`/__/lrcapi`)"
       service: lrcapi
       middlewares:
+        # This service does not have good builtin auth, so we add this layer.
+        - basic-auth
         - lrcapi-strip-prefix
     to-pihole:
       rule: "Host(`pi.hole`)"
       service: pihole
 
   middlewares:
-    traefik-basic-auth:
+    basic-auth:
       basicAuth:
         users:
           - "{{ vault_traefik.basic_auth_user }}"
+        removeHeader: true
     traefik-ip-whitelist:
       ipWhiteList:
         sourceRange:
