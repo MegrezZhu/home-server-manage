@@ -17,6 +17,7 @@ services:
       ND_LASTFM_APIKEY: "{{ vault_music.lastfm.api_key }}"
       ND_LASTFM_SECRET: "{{ vault_music.lastfm.shared_secret }}"
       ND_LASTFM_LANGUAGE: "zh"
+      ND_ENABLESHARING: true
     volumes:
       - "{{database}}:/data"
       - "{{content}}:/music:ro"
