@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     networks:
       - traefik-proxy-network
+    pull_policy: always
   lrcapi:
     # For use by StreamMusic: https://github.com/HisAtri/LrcApi
     image: hisatri/lrcapi:latest
@@ -33,6 +34,7 @@ services:
     # Default port: 28883
     networks:
       - traefik-proxy-network
+    pull_policy: always
 networks:
   traefik-proxy-network:
     external: true

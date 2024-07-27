@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     networks:
       - traefik-proxy-network
+    pull_policy: always
 networks:
   traefik-proxy-network:
     external: true

@@ -1,0 +1,9 @@
+---
+- name: Start ALL services
+  hosts: all
+  roles:
+    - common
+    - pihole
+    - lanraragi
+    - music
+    - traefik
