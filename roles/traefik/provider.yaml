@@ -74,6 +74,23 @@ http:
       middlewares:
         - redirect-to-https
 
+    unlock-music:
+      entrypoints:
+        - websecure
+      rule: "Host(`unlock-music.zyucoo.org`)"
+      service: unlock-music
+      tls:
+        certResolver: my-resolver
+      middlewares:
+        - basic-auth
+    unlock-music-http:
+      entrypoints:
+        - web
+      rule: "Host(`unlock-music.zyucoo.org`)"
+      service: unlock-music
+      middlewares:
+        - redirect-to-https
+
     pihole:
       rule: "Host(`pi.hole`)"
       service: pihole
@@ -115,3 +132,7 @@ http:
       loadBalancer:
         servers:
         - url: "http://host.docker.internal:{{ vault_pihole.WEB_PORT }}/"
+    unlock-music: 
+      loadBalancer:
+        servers:
+        - url: http://unlock_music:8080/

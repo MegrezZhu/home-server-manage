@@ -1,0 +1,33 @@
+---
+- name: Define service root
+  set_fact:
+    unlock_music: "{{ ansible_env.HOME }}/unlock_music"
+- name: Set up service root
+  file:
+    path: "{{ unlock_music }}"
+    state: directory
+- name: Set up Git repo directory
+  file:
+    path: "{{ unlock_music }}/git"
+    state: directory
+- name: Clone the repo
+  git:
+    repo: https://git.unlock-music.dev/um/web.git
+    dest: "{{ unlock_music }}/git"
+    depth: 1
+- name: Copy over up Dockerfile
+  copy:
+    src: ../Dockerfile
+    dest: "{{ unlock_music }}/Dockerfile"
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ unlock_music }}/compose.yaml"
+  vars:
+    # The path to a directory containing the context for building an image.
+    docker_build_context: "{{ unlock_music }}/git"
+    dockerfile_path: "{{ unlock_music }}/Dockerfile"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ unlock_music }}"
+    recreate: always

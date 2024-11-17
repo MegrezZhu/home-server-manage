@@ -21,6 +21,7 @@ services:
       # For connecting to host network using dns name "host.docker.internal"
       - "host.docker.internal:host-gateway"
     pull_policy: always
+    restart: unless-stopped
 networks:
   traefik-proxy-network:
     name: traefik-proxy-network

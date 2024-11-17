@@ -1,0 +1,14 @@
+---
+services:
+  unlock_music:
+    container_name: unlock_music_web
+    build:
+      context: "{{ docker_build_context }}"
+      dockerfile: "{{ dockerfile_path }}"
+    image: unlock_music_web
+    networks:
+      - traefik-proxy-network
+    restart: unless-stopped
+networks:
+  traefik-proxy-network:
+    external: true

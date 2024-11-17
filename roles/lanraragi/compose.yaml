@@ -10,6 +10,7 @@ services:
     networks:
       - traefik-proxy-network
     pull_policy: always
+  # TODO: Auto backup of the database files
 networks:
   traefik-proxy-network:
     external: true
