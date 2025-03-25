@@ -4,7 +4,7 @@ http:
     traefik:
       entrypoints:
         - websecure
-      rule: "Host(`traefik.zyucoo.org`)"
+      rule: "Host(`traefik.{{ vault_domain }}`)"
       service: api@internal
       middlewares:
         - ip-whitelist-lan-only
@@ -14,7 +14,7 @@ http:
     traefik-http:
       entrypoints:
         - web
-      rule: "Host(`traefik.zyucoo.org`)"
+      rule: "Host(`traefik.{{ vault_domain }}`)"
       service: api@internal
       middlewares:
         - redirect-to-https
@@ -22,7 +22,7 @@ http:
     lanraragi:
       entrypoints:
         - websecure
-      rule: "Host(`lanraragi.zyucoo.org`)"
+      rule: "Host(`lanraragi.{{ vault_domain }}`)"
       service: lanraragi
       middlewares:
         - ip-whitelist-lan-only
@@ -31,7 +31,7 @@ http:
     lanraragi-http:
       entrypoints:
         - web
-      rule: "Host(`lanraragi.zyucoo.org`)"
+      rule: "Host(`lanraragi.{{ vault_domain }}`)"
       service: lanraragi
       middlewares:
         - redirect-to-https
@@ -39,14 +39,14 @@ http:
     navidrome:
       entrypoints:
         - websecure
-      rule: "Host(`navidrome.zyucoo.org`)"
+      rule: "Host(`navidrome.{{ vault_domain }}`)"
       service: navidrome
       tls:
         certResolver: my-resolver
     navidrome-http:
       entrypoints:
         - web
-      rule: "Host(`navidrome.zyucoo.org`)"
+      rule: "Host(`navidrome.{{ vault_domain }}`)"
       service: navidrome
       middlewares:
         - redirect-to-https
@@ -55,10 +55,10 @@ http:
       entrypoints:
         - websecure
       # Apis of lrcapi:
-      # - Lyric: http://navidrome.zyucoo.org/__/lrcapi/api/v1/lyrics/single
-      # - Cover (new): http://navidrome.zyucoo.org/__/lrcapi/api/v1/cover/music
-      # - Cover (old, seems compatible with MusicStream): http://navidrome.zyucoo.org/__/lrcapi/cover
-      rule: "Host(`navidrome.zyucoo.org`) && PathPrefix(`/__/lrcapi`)"
+      # - Lyric: http://navidrome.{{ vault_domain }}/__/lrcapi/api/v1/lyrics/single
+      # - Cover (new): http://navidrome.{{ vault_domain }}/__/lrcapi/api/v1/cover/music
+      # - Cover (old, seems compatible with MusicStream): http://navidrome.{{ vault_domain }}/__/lrcapi/cover
+      rule: "Host(`navidrome.{{ vault_domain }}`) && PathPrefix(`/__/lrcapi`)"
       service: lrcapi
       middlewares:
         # This service does not have good builtin auth, so we add this layer.
@@ -69,7 +69,7 @@ http:
     lrcapi-http:
       entrypoints:
         - web
-      rule: "Host(`navidrome.zyucoo.org`) && PathPrefix(`/__/lrcapi`)"
+      rule: "Host(`navidrome.{{ vault_domain }}`) && PathPrefix(`/__/lrcapi`)"
       service: lrcapi
       middlewares:
         - redirect-to-https
@@ -77,7 +77,7 @@ http:
     unlock-music:
       entrypoints:
         - websecure
-      rule: "Host(`unlock-music.zyucoo.org`)"
+      rule: "Host(`unlock-music.{{ vault_domain }}`)"
       service: unlock-music
       tls:
         certResolver: my-resolver
@@ -86,14 +86,25 @@ http:
     unlock-music-http:
       entrypoints:
         - web
-      rule: "Host(`unlock-music.zyucoo.org`)"
+      rule: "Host(`unlock-music.{{ vault_domain }}`)"
       service: unlock-music
       middlewares:
         - redirect-to-https
 
     pihole:
-      rule: "Host(`pi.hole`)"
+      entrypoints:
+        - websecure
+      rule: "Host(`pi.hole.{{ vault_domain }}`)"
       service: pihole
+      tls:
+        certResolver: my-resolver
+    pihole-http:
+      entrypoints:
+        - web
+      rule: "Host(`pi.hole.{{ vault_domain }}`)"
+      service: pihole
+      middlewares:
+        - redirect-to-https
 
   middlewares:
     basic-auth:
@@ -131,7 +142,7 @@ http:
     pihole:
       loadBalancer:
         servers:
-        - url: "http://host.docker.internal:{{ vault_pihole.WEB_PORT }}/"
+        - url: "http://pihole:80/"
     unlock-music: 
       loadBalancer:
         servers:

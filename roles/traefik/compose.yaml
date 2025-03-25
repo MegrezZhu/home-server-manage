@@ -22,6 +22,8 @@ services:
       - "host.docker.internal:host-gateway"
     pull_policy: always
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
 networks:
   traefik-proxy-network:
     name: traefik-proxy-network
