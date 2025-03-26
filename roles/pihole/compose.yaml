@@ -5,8 +5,9 @@ services:
     image: pihole/pihole:latest
     # Important: Special steps needed for Ubuntu to free port 53: https://github.com/pi-hole/docker-pi-hole?tab=readme-ov-file#installing-on-ubuntu-or-fedora
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
+      # https://stackoverflow.com/a/69994721
+      - "{{ ansible_default_ipv4['address'] }}:53:53/tcp"
+      - "{{ ansible_default_ipv4['address'] }}:53:53/udp"
     environment:
       TZ: "America/Chicago"
       FTLCONF_webserver_api_password: "{{ vault_pihole.WEBPASSWORD }}"
