@@ -1,0 +1,6 @@
+---
+- name: proxies
+  hosts: all
+  roles:
+    - common
+    - proxies

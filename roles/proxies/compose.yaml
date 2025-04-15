@@ -1,0 +1,17 @@
+---
+services:
+  v2ray:
+    image: v2fly/v2fly-core
+    container_name: v2ray
+    command:
+      - run
+      - -c
+      - /etc/v2ray/config.json
+    volumes:
+      - "{{config}}:/etc/v2ray/config.json:ro"
+    ports:
+      # Internal access only
+      - "{{ ansible_default_ipv4['address'] }}:10080:10080" # HTTP
+      - "{{ ansible_default_ipv4['address'] }}:10081:10081" # SOCKS
+    restart: unless-stopped
+    pull_policy: always

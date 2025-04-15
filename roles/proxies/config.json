@@ -1,0 +1,115 @@
+{
+    "log": {
+        "loglevel": "warning"
+    },
+    "inbounds": [
+        {
+            "port": 10080,
+            "listen": "0.0.0.0",
+            "tag": "http-inbound-cn",
+            "protocol": "http"
+        },
+        {
+            "port": 10081,
+            "listen": "0.0.0.0",
+            "tag": "socks-inbound-cn",
+            "protocol": "socks",
+            "settings": {
+                "auth": "noauth",
+                "udp": true,
+                // IP address of the host
+                "ip": "{{ ansible_default_ipv4['address'] }}"
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        }
+    ],
+    "outbounds": [
+        {
+            "protocol": "shadowsocks",
+            "settings": {
+                "servers": [
+                    {
+                        "address": "{{ cn_server }}",
+                        "method": "aes-256-gcm",
+                        "password": "{{ cn_server_shadowsocks_password }}",
+                        "port": 10080
+                    }
+                ]
+            },
+            "tag": "cn"
+        },
+        {
+            "protocol": "vmess",
+            "settings": {
+                "vnext": [
+                    {
+                        "address": "{{ cn_server }}",
+                        "port": 10082,
+                        "users": [
+                            {
+                                "id": "{{ cn_server_vmess_id }}",
+                                "alterId": 64
+                            }
+                        ]
+                    }
+                ]
+            },
+            "tag": "cn-vmess"
+        },
+        {
+            "protocol": "blackhole",
+            "settings": {},
+            "tag": "blocked"
+        }
+    ],
+    "routing": {
+        "domainStrategy": "IPOnDemand",
+        "rules": [
+            {
+                // Blocks access to private IPs. Remove this if you want to access your router.
+                "type": "field",
+                "ip": [
+                    "geoip:private"
+                ],
+                "outboundTag": "blocked"
+            },
+            {
+                "type": "field",
+                "outboundTag": "cn-vmess",
+                "inboundTag": [
+                    "socks-inbound-cn",
+                    "http-inbound-cn"
+                ]
+            }
+        ]
+    },
+    // Dns settings for domain resolution.
+    "dns": {
+        // Static hosts, similar to hosts file.
+        "hosts": {},
+        "servers": [
+            "1.1.1.1",
+            "8.8.8.8",
+            "localhost"
+        ]
+    },
+    "policy": {
+        "levels": {
+            "0": {
+                "uplinkOnly": 0,
+                "downlinkOnly": 0
+            }
+        },
+        "system": {
+            "statsInboundUplink": false,
+            "statsInboundDownlink": false
+        }
+    },
+    "other": {}
+}

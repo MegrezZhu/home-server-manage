@@ -1,0 +1,26 @@
+---
+- name: Define service root
+  set_fact:
+    v2ray: "{{ ansible_env.HOME }}/v2ray"
+- name: Set up service root
+  file:
+    path: "{{ v2ray }}"
+    state: directory
+- name: Copy over config
+  template:
+    src: ../config.json
+    dest: "{{ v2ray }}/config.json"
+  vars:
+    cn_server: "{{ vault_proxies.cn_server }}"
+    cn_server_shadowsocks_password: "{{ vault_proxies.cn_server_shadowsocks_password }}"
+    cn_server_vmess_id: "{{ vault_proxies.cn_server_vmess_id }}"
+- name: Copy over docker compose
+  template:
+    src: ../compose.yaml
+    dest: "{{ v2ray }}/compose.yaml"
+  vars:
+    config: "{{ v2ray }}/config.json"
+- name: Bring up service
+  community.docker.docker_compose_v2:
+    project_src: "{{ v2ray }}"
+    recreate: always
